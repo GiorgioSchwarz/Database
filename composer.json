@@ -1,0 +1,21 @@
+{
+    "name": "molnapps/database",
+    "description": "Database abstraction layer",
+    "authors": [
+        {
+            "name": "***REMOVED***",
+            "email": "***REMOVED***"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+    },
+    "require-dev": {
+        "phpunit/phpunit": "5.4.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "MolnApps\\": "src/MolnApps/"
+        }
+    }
+}
