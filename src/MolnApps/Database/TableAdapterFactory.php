@@ -2,6 +2,10 @@
 
 namespace MolnApps\Database;
 
+use \MolnApps\Database\Adapter\MemoryTableAdapter;
+use \MolnApps\Database\Adapter\MysqlTableAdapter;
+use \MolnApps\Database\Adapter\SqliteTableAdapter;
+
 class TableAdapterFactory
 {
 	public static function instance()
@@ -9,16 +13,18 @@ class TableAdapterFactory
 		return new static;
 	}
 	
-	public function createTableAdapter($driver, $table)
+	public function createTableAdapter(Dsn $dsn, $table)
 	{
-		switch ($driver)
-		{
-			case 'memory':
-				return new MemoryTableAdapter;
-			case 'sqlite':
-				return new SqliteTableAdapter($table);
-			case 'mysql':
-				return new MysqlTableAdapter($table);
+		$adapters = [
+			'memory' => MemoryTableAdapter::class,
+			'mysql' => MysqlTableAdapter::class,
+			'sqlite' => SqliteTableAdapter::class,
+		];
+		
+		if (isset($adapters[$dsn->getDriver()])) {
+			return new $adapters[$dsn->getDriver()]($table);
 		}
+
+		throw new \Exception('Please provide a valid driver.');
 	}
 }

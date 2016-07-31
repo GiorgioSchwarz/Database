@@ -3,13 +3,13 @@
 namespace MolnApps\Database\Adapter;
 
 use \Pdo;
-use \MolnApps\Database\Config;
+use \MolnApps\Database\Dsn;
 
 class SqliteTableAdapter extends AbstractTableAdapter
 {
-	protected function createPdo()
+	protected function createPdo(Dsn $dsn)
 	{
-		$dsn = Config::dsn();
+		$dsn = $dsn->getDsn();
 
 		return new Pdo('sqlite:' . $dsn['database']);
 	}

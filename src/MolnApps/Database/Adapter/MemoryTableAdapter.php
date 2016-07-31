@@ -4,6 +4,7 @@ namespace MolnApps\Database\Adapter;
 
 use \MolnApps\Database\Value\Value;
 use \MolnApps\Database\TableAdapter;
+use \MolnApps\Database\Statement;
 
 class MemoryTableAdapter implements TableAdapter
 {
@@ -13,24 +14,75 @@ class MemoryTableAdapter implements TableAdapter
 	public function select(array $query)
 	{
 		if ( ! $query) {
-			return array_values($this->rows);
+			return $this->returnAllRows();
 		}
 
-		$where = isset($query['where']) ? $query['where'] : null;
-		$limit = isset($query['limit']) ? $query['limit'] : count($this->rows);
+		return $this->returnRequestedRows($query);
+	}
 
+	private function returnAllRows()
+	{
+		return array_values($this->rows);
+	}
+
+	private function returnRequestedRows(array $query)
+	{
 		$rows = [];
 
 		foreach ($this->rows as $row) {
-			if ( 
-				count($rows) < $limit &&
-				( ! $where || Value::create($row)->matches($where))
-			) {
-				$rows[] = $row;
+			if ($this->rowMatches($query, $row)) {
+				$rows[] = $this->getOnlyRequestedColumns($query, $row);
 			}
 		}
 
-		return $rows;
+		return $this->trimResultsToLimits($query, $rows);
+	}
+
+	private function rowMatches($query, $row)
+	{
+		$where = isset($query['where']) ? $query['where'] : null;
+		return ( ! $where || Value::create($row)->matches($where));
+	}
+
+	private function getOnlyRequestedColumns($query, $row)
+	{
+		$columns = isset($query['columns']) ? $query['columns'] : array_keys($row);
+		
+		$result = [];
+		
+		foreach ($columns as $column) {
+			$result[$column] = $row[$column];
+		}
+		
+		return $result;
+	}
+
+	private function trimResultsToLimits($query, $rows)
+	{
+		$result = [];
+
+		foreach ($rows as $i => $row) {
+			if (
+				$this->currentRowIsAboveOffset($query, $i) && 
+				$this->selectedRowsAreUnderLimit($query, $result)
+			) {
+				$result[] = $row;
+			}
+		}
+
+		return $result;
+	}
+
+	private function currentRowIsAboveOffset($query, $i)
+	{
+		$offset = isset($query['offset']) ? $query['offset'] : 0;
+		return $i >= $offset;
+	}
+
+	private function selectedRowsAreUnderLimit($query, $rows)
+	{
+		$limit = isset($query['limit']) ? $query['limit'] : count($this->rows);
+		return count($rows) < $limit;
 	}
 
 	public function insert(array $assignments)

@@ -4,44 +4,11 @@ namespace MolnApps\Database;
 
 class TableGateway
 {
-	private static $driver;
-	private static $registered = [];
-
+	private $tableAdapter;
+	
 	public function __construct(TableAdapter $tableAdapter)
 	{
-		$this->tableAdapter = ($tableAdapter);
-	}
-
-	// ! Factory and testing methods
-
-	public static function register($table, TableGateway $tableGateway = null)
-	{
-		$tableGateway = ($tableGateway) ?: static::create($table);
-		
-		static::$registered[$table] = $tableGateway;
-
-		return $tableGateway;
-	}
-
-	public static function reset()
-	{
-		static::$registered = [];
-	}
-
-	public static function get($table)
-	{
-		if (isset(static::$registered[$table])) {
-			return static::$registered[$table];
-		}
-
-		return static::create($table);
-	}
-
-	public static function create($table)
-	{
-		$adapter = TableAdapterFactory::instance()->createTableAdapter(Config::driver(), $table);
-
-		return new static($adapter);
+		$this->tableAdapter = $tableAdapter;
 	}
 
 	// ! Query methods
@@ -85,7 +52,9 @@ class TableGateway
 			$query &&
 			! isset($query['where']) && 
 			! isset($query['columns']) && 
-			! isset($query['limit'])
+			! isset($query['limit']) &&
+			! isset($query['offset']) &&
+			! isset($query['order'])
 		) {
 			$query = ['where' => $query];
 		}

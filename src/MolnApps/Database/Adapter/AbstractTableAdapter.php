@@ -7,6 +7,7 @@ use \PDO;
 use \Exception;
 
 use \MolnApps\Database\TableAdapter;
+use \MolnApps\Database\Dsn;
 
 use \App\Database\Sql\Statement\Statement;
 use \App\Database\Sql\Statement\Insert;
@@ -19,18 +20,18 @@ abstract class AbstractTableAdapter implements TableAdapter
 	private $table;
 	private $pdo;
 
-	public function __construct($table)
+	public function __construct(Dsn $dsn, $table)
 	{
 		$this->table = $table;
 
 		try {
-			$this->pdo = $this->createPdo();
+			$this->pdo = $this->createPdo($dsn);
 		} catch (Exception $e) {
 			die('Could not connect to the database');
 		}
 	}
 
-	abstract protected function createPdo();
+	abstract protected function createPdo(Dsn $dsn);
 	
 	public function select(array $query)
 	{
