@@ -39,4 +39,13 @@ class DeleteTest extends \PHPUnit_Framework_TestCase
 		$this->assertEquals('DELETE FROM news WHERE', $insert->getStatement());
 		$this->assertEquals([], $insert->getParams());
 	}
+
+	/** @test */
+	public function it_will_create_query_with_limit_if_provided()
+	{
+		$insert = new Delete('news', [['id', 'in', [1, 2, 3, 4]]], 10);
+
+		$this->assertEquals('DELETE FROM news WHERE id IN (?, ?, ?, ?) LIMIT 10', $insert->getStatement());
+		$this->assertEquals([1, 2, 3, 4], $insert->getParams());
+	}
 }

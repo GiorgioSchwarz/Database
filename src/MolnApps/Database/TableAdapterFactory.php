@@ -22,7 +22,7 @@ class TableAdapterFactory
 		];
 		
 		if (isset($adapters[$dsn->getDriver()])) {
-			return new $adapters[$dsn->getDriver()]($table);
+			return new $adapters[$dsn->getDriver()]($dsn, $table);
 		}
 
 		throw new \Exception('Please provide a valid driver.');

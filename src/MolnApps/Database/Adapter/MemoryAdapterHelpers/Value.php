@@ -1,6 +1,6 @@
 <?php
 
-namespace MolnApps\Database\Value;
+namespace MolnApps\Database\Adapter\MemoryAdapterHelpers;
 
 class Value
 {
@@ -46,6 +46,10 @@ class Value
 	private function valueMatches($columnValue, $operator, $expectedValue)
 	{
 		if ($operator == 'eq' && $columnValue == $expectedValue) {
+			return true;
+		}
+
+		if ($operator == 'not' && $columnValue != $expectedValue) {
 			return true;
 		}
 		

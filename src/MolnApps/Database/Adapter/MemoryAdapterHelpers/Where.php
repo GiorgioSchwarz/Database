@@ -1,6 +1,6 @@
 <?php
 
-namespace MolnApps\Database\Value;
+namespace MolnApps\Database\Adapter\MemoryAdapterHelpers;
 
 class Where
 {

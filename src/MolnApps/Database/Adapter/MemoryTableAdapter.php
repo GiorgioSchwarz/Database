@@ -2,16 +2,21 @@
 
 namespace MolnApps\Database\Adapter;
 
-use \MolnApps\Database\Value\Value;
 use \MolnApps\Database\TableAdapter;
+
 use \MolnApps\Database\Statement;
+
+use \MolnApps\Database\Adapter\MemoryAdapterHelpers\Columns;
+use \MolnApps\Database\Adapter\MemoryAdapterHelpers\Filter;
+use \MolnApps\Database\Adapter\MemoryAdapterHelpers\Limit;
+use \MolnApps\Database\Adapter\MemoryAdapterHelpers\Sort;
 
 class MemoryTableAdapter implements TableAdapter
 {
 	private $index = 0;
 	private $rows = [];
 
-	public function select(array $query)
+	public function select(array $query = [])
 	{
 		if ( ! $query) {
 			return $this->returnAllRows();
@@ -27,62 +32,32 @@ class MemoryTableAdapter implements TableAdapter
 
 	private function returnRequestedRows(array $query)
 	{
-		$rows = [];
+		$rows = $this->getMatchingRows($query, $this->rows);
+		$rows = $this->getRequestedColumns($query, $rows);
+		$rows = $this->getSortedRows($query, $rows);
+		$rows = $this->getRowsWithinLimit($query, $rows);
 
-		foreach ($this->rows as $row) {
-			if ($this->rowMatches($query, $row)) {
-				$rows[] = $this->getOnlyRequestedColumns($query, $row);
-			}
-		}
-
-		return $this->trimResultsToLimits($query, $rows);
+		return $rows;
 	}
 
-	private function rowMatches($query, $row)
+	private function getMatchingRows(array $query, array $rows)
 	{
-		$where = isset($query['where']) ? $query['where'] : null;
-		return ( ! $where || Value::create($row)->matches($where));
+		return Filter::create($rows, $query)->get();
 	}
 
-	private function getOnlyRequestedColumns($query, $row)
+	private function getRequestedColumns(array $query, array $rows)
 	{
-		$columns = isset($query['columns']) ? $query['columns'] : array_keys($row);
-		
-		$result = [];
-		
-		foreach ($columns as $column) {
-			$result[$column] = $row[$column];
-		}
-		
-		return $result;
+		return Columns::create($rows, $query)->get();
 	}
 
-	private function trimResultsToLimits($query, $rows)
+	private function getSortedRows(array $query, array $rows)
 	{
-		$result = [];
-
-		foreach ($rows as $i => $row) {
-			if (
-				$this->currentRowIsAboveOffset($query, $i) && 
-				$this->selectedRowsAreUnderLimit($query, $result)
-			) {
-				$result[] = $row;
-			}
-		}
-
-		return $result;
+		return Sort::create($rows, $query)->get();
 	}
 
-	private function currentRowIsAboveOffset($query, $i)
+	private function getRowsWithinLimit(array $query, array $rows)
 	{
-		$offset = isset($query['offset']) ? $query['offset'] : 0;
-		return $i >= $offset;
-	}
-
-	private function selectedRowsAreUnderLimit($query, $rows)
-	{
-		$limit = isset($query['limit']) ? $query['limit'] : count($this->rows);
-		return count($rows) < $limit;
+		return Limit::create($rows, $query)->get();
 	}
 
 	public function insert(array $assignments)

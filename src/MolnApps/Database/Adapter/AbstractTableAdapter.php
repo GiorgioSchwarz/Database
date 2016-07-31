@@ -8,12 +8,12 @@ use \Exception;
 
 use \MolnApps\Database\TableAdapter;
 use \MolnApps\Database\Dsn;
+use \MolnApps\Database\Statement;
 
-use \App\Database\Sql\Statement\Statement;
-use \App\Database\Sql\Statement\Insert;
-use \App\Database\Sql\Statement\Select;
-use \App\Database\Sql\Statement\Update;
-use \App\Database\Sql\Statement\Delete;
+use \MolnApps\Database\Statement\Sql\Insert;
+use \MolnApps\Database\Statement\Sql\Select;
+use \MolnApps\Database\Statement\Sql\Update;
+use \MolnApps\Database\Statement\Sql\Delete;
 
 abstract class AbstractTableAdapter implements TableAdapter
 {
@@ -33,7 +33,7 @@ abstract class AbstractTableAdapter implements TableAdapter
 
 	abstract protected function createPdo(Dsn $dsn);
 	
-	public function select(array $query)
+	public function select(array $query = [])
 	{
 		$query = $this->normalizeQuery($query);
 
@@ -101,7 +101,7 @@ abstract class AbstractTableAdapter implements TableAdapter
 	{
 		$query = $this->normalizeQuery($query);
 
-		$statement = new Delete($this->table, $query['where']);
+		$statement = new Delete($this->table, $query['where'], $query['limit']);
 
 		return $this->executeUpdate($statement);
 	}
