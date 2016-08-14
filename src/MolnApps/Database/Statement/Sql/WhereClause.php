@@ -2,6 +2,8 @@
 
 namespace MolnApps\Database\Statement\Sql;
 
+use \MolnApps\Database\Statement;
+
 class WhereClause
 {
 	private $stringOperatorsMap = [
@@ -135,7 +137,7 @@ class WhereClause
 
 	private function containsSubquery($values)
 	{
-		return $values instanceof Select;
+		return $values instanceof Statement;
 	}
 
 	private function appendPart($part)

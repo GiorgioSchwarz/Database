@@ -56,6 +56,21 @@ class SelectTest extends \PHPUnit_Framework_TestCase
 	}
 
 	/** @test */
+	public function it_builds_a_query_specifying_subquery_in_where_clause()
+	{
+		$select = new Select('news', [], [
+			['id', 'in', new Select('privileges', ['news_id'], ['user_id' => 5])]
+		]);
+
+		$this->assertEquals(
+			'SELECT * FROM news WHERE id IN (SELECT news_id FROM privileges WHERE user_id = ?)', 
+			$select->getStatement()
+		);
+
+		$this->assertEquals([5], $select->getParams());
+	}
+
+	/** @test */
 	public function it_builds_a_query_specifying_default_order()
 	{
 		$select = new Select('news', [], [], ['created_at']);
