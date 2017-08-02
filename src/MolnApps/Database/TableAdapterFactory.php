@@ -3,22 +3,16 @@
 namespace MolnApps\Database;
 
 use \MolnApps\Database\Adapter\MemoryTableAdapter;
-use \MolnApps\Database\Adapter\MysqlTableAdapter;
-use \MolnApps\Database\Adapter\SqliteTableAdapter;
+use \MolnApps\Database\Adapter\BaseTableAdapter;
 
 class TableAdapterFactory
 {
-	public static function instance()
-	{
-		return new static;
-	}
-	
-	public function createTableAdapter(Dsn $dsn, $table)
+	public function createTableAdapter(DsnDriver $dsn, $table)
 	{
 		$adapters = [
 			'memory' => MemoryTableAdapter::class,
-			'mysql' => MysqlTableAdapter::class,
-			'sqlite' => SqliteTableAdapter::class,
+			'mysql' => BaseTableAdapter::class,
+			'sqlite' => BaseTableAdapter::class,
 		];
 		
 		if (isset($adapters[$dsn->getDriver()])) {

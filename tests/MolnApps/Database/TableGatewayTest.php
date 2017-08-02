@@ -3,30 +3,34 @@
 namespace MolnApps\Database;
 
 use \MolnApps\Database\Dsn;
+use \MolnApps\Database\Container\Container;
 
 class TableGatewayTest extends \PHPUnit_Framework_TestCase
 {
+	private $tableGatewayFactory;
 	private $table;
 
 	protected function setUp()
 	{
+		$this->tableGatewayFactory = Container::get('tableGatewayFactory');
+
 		// TableGateway can be created through static constructor
-		$tableGatewayInstance = TableGatewayFactory::create('people', new Dsn('memory'));
+		$tableGatewayInstance = $this->tableGatewayFactory->createTable('people', new Dsn('memory'));
 		
 		// A TableGateway instance can be registered to be accessed as a singleton
 		// through the TableGateway::get('table') method.
-		TableGatewayFactory::register('people', $tableGatewayInstance);
+		$this->tableGatewayFactory->registerTable('people', $tableGatewayInstance);
 	}
 
 	protected function tearDown()
 	{
-		TableGatewayFactory::reset();
+		Container::reset();
 	}
 
 	/** @test */
 	public function it_inserts_a_record_and_returns_last_insert_id()
 	{
-		$this->table = TableGatewayFactory::get('people');
+		$this->table = $this->tableGatewayFactory->getTable('people');
 
 		$this->table->insert(['firstName' => 'John', 'lastName' => 'Doe']);
 		$this->assertEquals(1, $this->table->lastInsertId());
@@ -38,7 +42,7 @@ class TableGatewayTest extends \PHPUnit_Framework_TestCase
 	/** @test */
 	public function it_updates_a_record()
 	{
-		$this->table = TableGatewayFactory::get('people');
+		$this->table = $this->tableGatewayFactory->getTable('people');
 
 		$this->insertRows([
 			['firstName' => 'John', 'lastName' => 'Doe'],
@@ -58,7 +62,7 @@ class TableGatewayTest extends \PHPUnit_Framework_TestCase
 	/** @test */
 	public function it_deletes_a_record()
 	{
-		$this->table = TableGatewayFactory::get('people');
+		$this->table = $this->tableGatewayFactory->getTable('people');
 
 		$this->insertRows([
 			['firstName' => 'John', 'lastName' => 'Doe'],
@@ -76,7 +80,7 @@ class TableGatewayTest extends \PHPUnit_Framework_TestCase
 	/** @test */
 	public function it_selects_all_records()
 	{
-		$this->table = TableGatewayFactory::get('people');
+		$this->table = $this->tableGatewayFactory->getTable('people');
 
 		$this->insertRows([
 			['firstName' => 'John', 'lastName' => 'Doe'],
@@ -96,7 +100,7 @@ class TableGatewayTest extends \PHPUnit_Framework_TestCase
 	/** @test */
 	public function it_selects_records_with_where_clause()
 	{
-		$this->table = TableGatewayFactory::get('people');
+		$this->table = $this->tableGatewayFactory->getTable('people');
 
 		$this->insertRows([
 			['firstName' => 'John', 'lastName' => 'Doe'],
@@ -114,7 +118,7 @@ class TableGatewayTest extends \PHPUnit_Framework_TestCase
 	/** @test */
 	public function it_selects_records_with_query()
 	{
-		$this->table = TableGatewayFactory::get('people');
+		$this->table = $this->tableGatewayFactory->getTable('people');
 
 		$this->insertRows([
 			['firstName' => 'John', 'lastName' => 'Doe'],

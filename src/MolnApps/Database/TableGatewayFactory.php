@@ -2,43 +2,35 @@
 
 namespace MolnApps\Database;
 
+use \MolnApps\Database\Container\Container;
+
 class TableGatewayFactory
 {
-	private static $driver;
-	private static $registered = [];
+	private $registered = [];
 
-	// ! Factory and testing methods
-
-	public static function register($table, TableGateway $tableGateway = null)
+	public function registerTable($table, TableGateway $tableGateway = null)
 	{
-		$tableGateway = ($tableGateway) ?: static::create($table);
+		$tableGateway = $tableGateway ?: $this->createTable($table);
 		
-		static::$registered[$table] = $tableGateway;
+		$this->registered[$table] = $tableGateway;
 
 		return $tableGateway;
 	}
 
-	public static function reset()
+	public function getTable($table, DsnDriver $dsn = null)
 	{
-		static::$registered = [];
-	}
-
-	public static function get($table, Dsn $dsn = null)
-	{
-		if (isset(static::$registered[$table])) {
-			return static::$registered[$table];
+		if (isset($this->registered[$table])) {
+			return $this->registered[$table];
 		}
 
-		return static::create($table, $dsn);
+		return $this->createTable($table, $dsn);
 	}
 
-	public static function create($table, Dsn $dsn = null)
+	public function createTable($table, DsnDriver $dsn = null)
 	{
-		if ( ! $dsn) {
-			$dsn = new Dsn(Config::driver(), Config::dsn());
-		}
-
-		$adapter = TableAdapterFactory::instance()->createTableAdapter($dsn, $table);
+		$dsn = $dsn ?: Container::get('dsn');
+		
+		$adapter = Container::get('tableAdapterFactory')->createTableAdapter($dsn, $table);
 
 		return new TableGateway($adapter);
 	}

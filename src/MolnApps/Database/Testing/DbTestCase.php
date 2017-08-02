@@ -7,7 +7,7 @@ use \PHPUnit_Extensions_Database_TestCase as PHPUnit_DbTestCase;
 
 abstract class DbTestCase extends PHPUnit_DbTestCase
 {
-    private $pdo;
+    protected $pdo;
 
     protected function setUp()
     {

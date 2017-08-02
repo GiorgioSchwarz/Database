@@ -14,7 +14,7 @@
         <var name="DB_MYSQL_PASSWORD" value="secret" />
         <var name="DB_MYSQL_DATABASE" value="testing_db" />
 
-        <var name="DB_SQLITE_DSN" value="sqlite:dbname=/var/www/Packages/Database/sqlite/testing_db.sqlite" />
-        <var name="DB_SQLITE_DATABASE" value="/var/www/Packages/Database/sqlite/testing_db.sqlite" />
+        <var name="DB_SQLITE_DSN" value="sqlite:dbname=./sqlite/testing_db.sqlite" />
+        <var name="DB_SQLITE_DATABASE" value="./sqlite/testing_db.sqlite" />
     </php>
 </phpunit>

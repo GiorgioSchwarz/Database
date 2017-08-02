@@ -2,19 +2,27 @@
 
 namespace MolnApps\Database;
 
+use \MolnApps\Database\Container\Container;
+
 use \MolnApps\Database\Dsn;
 
 class TableGatewayFactoryTest extends \PHPUnit_Framework_TestCase
 {
+	/** @before */
+	protected function setUpInstance()
+	{
+		$this->factory = Container::get('tableGatewayFactory');
+	}
+
 	protected function tearDown()
 	{
-		TableGatewayFactory::reset();
+		Container::reset();
 	}
 
 	/** @test */
 	public function it_creates_a_table_gateway()
 	{
-		$tableGateway = TableGatewayFactory::create('people', new Dsn('memory'));
+		$tableGateway = $this->factory->createTable('people', new Dsn('memory'));
 
 		$this->assertInstanceOf(TableGateway::class, $tableGateway);
 	}
@@ -22,11 +30,11 @@ class TableGatewayFactoryTest extends \PHPUnit_Framework_TestCase
 	/** @test */
 	public function it_registers_a_table_gateway_and_returns_it_upon_request()
 	{
-		$tableGatewayInstance = TableGatewayFactory::create('people', new Dsn('memory'));
+		$tableGatewayInstance = $this->factory->createTable('people', new Dsn('memory'));
 		
-		TableGatewayFactory::register('people', $tableGatewayInstance);
+		$this->factory->registerTable('people', $tableGatewayInstance);
 
-		$tableGateway = TableGatewayFactory::get('people');
+		$tableGateway = $this->factory->getTable('people');
 
 		$this->assertEquals($tableGatewayInstance, $tableGateway);
 	}

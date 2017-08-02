@@ -2,15 +2,15 @@
 
 namespace MolnApps\Database;
 
-class Dsn
+class Dsn implements PdoDsn, DsnDriver
 {
 	private $driver;
-	private $dsn = [];
+	private $pdo;
 
-	public function __construct($driver, array $dsn = [])
+	public function __construct($driver, \Pdo $pdo = null)
 	{
 		$this->driver = $driver;
-		$this->dsn = $dsn;
+		$this->pdo = $pdo;
 	}
 
 	public function getDriver()
@@ -18,8 +18,8 @@ class Dsn
 		return $this->driver;
 	}
 
-	public function getDsn()
+	public function getPdo()
 	{
-		return $this->dsn;
+		return $this->pdo;
 	}
 }

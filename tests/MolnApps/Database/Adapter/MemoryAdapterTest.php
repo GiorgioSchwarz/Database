@@ -2,6 +2,8 @@
 
 namespace MolnApps\Database\Adapter;
 
+use \MolnApps\Database\Container\Container;
+
 use \MolnApps\Database\Dsn;
 use \MolnApps\Database\TableAdapterFactory;
 
@@ -13,7 +15,14 @@ class MemoryAdapterTest extends \PHPUnit_Framework_TestCase
 
 	private $tableAdapters = [];
 
-	protected function setUp()
+	/** @before */
+	protected function setUpTableAdapterFactory()
+	{
+		$this->tableAdapterFactory = Container::get('tableAdapterFactory');
+	}
+
+	/** @before */
+	protected function setUpWorld()
 	{
 		$this->createTableAdapter('people');
 		
@@ -22,16 +31,22 @@ class MemoryAdapterTest extends \PHPUnit_Framework_TestCase
 		}
 	}
 
-	protected function tearDown()
+	/** @after */
+	protected function tearDownTableAdapters()
 	{
 		$this->tableAdapters = [];
+	}
+	
+	/** @after */
+	protected function tearDownContainer()
+	{
+		Container::reset();
 	}
 
 	protected function createTableAdapter($table)
 	{
 		if ( ! isset($this->tableAdapters[$table])) {
-			$this->tableAdapters[$table] = TableAdapterFactory::instance()
-				->createTableAdapter($this->createDsn(), $table);
+			$this->tableAdapters[$table] = $this->tableAdapterFactory->createTableAdapter($this->createDsn(), $table);
 		}
 		
 		return $this->tableAdapters[$table];
@@ -39,6 +54,6 @@ class MemoryAdapterTest extends \PHPUnit_Framework_TestCase
 
 	private function createDsn()
 	{
-		return new Dsn('memory', []);
+		return new Dsn('memory', null);
 	}
 }

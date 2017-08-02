@@ -14,7 +14,7 @@
         <var name="DB_MYSQL_PASSWORD" value="passwd" />
         <var name="DB_MYSQL_DATABASE" value="myguestbook" />
 
-        <var name="DB_SQLITE_DSN" value="sqlite:dbname=/var/www/Packages/Database/sqlite/testing_db.sqlite" />
-        <var name="DB_SQLITE_DATABASE" value="/var/www/Packages/Database/sqlite/testing_db.sqlite" />
+        <var name="DB_SQLITE_DSN" value="sqlite:dbname=./sqlite/testing_db.sqlite" />
+        <var name="DB_SQLITE_DATABASE" value="./sqlite/testing_db.sqlite" />
     </php>
 </phpunit>
