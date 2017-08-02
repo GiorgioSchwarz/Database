@@ -2,14 +2,14 @@
 
 namespace MolnApps\Database\Container;
 
-use \Pimple\Container;
+use \Pimple\Container as PimpleContainer;
 use \Pimple\ServiceProviderInterface;
 
 use \MolnApps\Database\Config;
 
 class DatabaseProvider implements ServiceProviderInterface
 {
-    public function register(Container $container)
+    public function register(PimpleContainer $container)
     {
         $container['tableGatewayFactory'] = function($c) {
         	return new \MolnApps\Database\TableGatewayFactory;
